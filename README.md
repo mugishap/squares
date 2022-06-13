@@ -6,13 +6,14 @@ This is a stock management system to simplify the recording and making business 
 
 Create users:
 CREATE TABLE users (
-user_id varchar(255) varchar UUID() NOT NULL UNIQUE,
-count INT PRIMARY KEY AUTO_INCREMENT,
+user_id varchar(255) DEFAULT UUID() NOT NULL,
+count int AUTO_INCREMENT PRIMARY KEY,
 firstname varchar(30) NOT NULL,
 lastname varchar(30) NOT NULL,
 username varchar(30) NOT NULL,
 email varchar(70) NOT NULL,
-password varchar(255) NOT NULL,
+company varchar(30) NOT NULL,
+password varchar(255) NOT NULL
 );
 
 #Create entries:
