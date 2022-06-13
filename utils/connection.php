@@ -1,30 +1,17 @@
 <?php
 
-class Connection{
-private $host;
-private $user;
-private $pass;
-private $db;
-private $connection;
+include './../config.php';
 
-    public function __construct(){
-        $this->host = "127.0.0.1";
-        $this->user = "root";
-        $this->pass = "";
-        $this->db = "squares";
-    }
+$dsn = "mysql:host=$host;dbname=$db;charset=UTF8";
 
-    public function connect(){
-        $this->connection = new mysqli($this->host, $this->user, $this->pass, $this->db);
-        if($this->connection->connect_error){
-            die("Connection failed: " . $this->connection->connect_error);
-        }
-    }
+try {
+	$pdo = new PDO($dsn, $user, $password);
 
-    public function close(){
-        $this->connection->close();
-    }
-
+	if ($pdo) {
+		echo "Connected to the $db database successfully!";
+	}
+} catch (PDOException $e) {
+	echo $e->getMessage();
 }
 
 ?>
