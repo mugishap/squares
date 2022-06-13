@@ -28,11 +28,14 @@ if (isset($_POST['newentry'])) {
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home</title>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
 </head>
 
 <body>
     <div class="table">
-        <table>
+        <table  class="display" style="width:100%">
             <thead>
                 <th>No</th>
                 <th>Date</th>
@@ -59,9 +62,9 @@ if (isset($_POST['newentry'])) {
                     $last = $entries[$i]['count'];
                 }
                 ?>
-                <form action="#" method="POST" onsubmit="(e)=>{e.preventDefault()}">
+                <form action="#" method="POST">
                     <tr class="w-full h-full">
-                        <td><input type="text" name="number" id="" placeholder="No" readonly class="" value="<?=$last + 1?>"></td>
+                        <td><input type="text" name="number" id="" placeholder="No" readonly class="" value="<?= $last + 1 ?>"></td>
                         <td><input type="text" name="date" id="" placeholder="Date" value="<?= time() ?>" readonly class=""></td>
                         <td><input type="text" name="title" required id="" placeholder="Title.." class=""></td>
                         <td><input type="text" name="amount" required id="" placeholder="Amount...." class=""></td>
@@ -80,6 +83,13 @@ if (isset($_POST['newentry'])) {
         }
         ?>
     </div>
+    <script>
+        $(document).ready(function() {
+            $('table').DataTable({
+                pagingType: 'full_numbers',
+            });
+        });
+    </script>
 </body>
 
 </html>
