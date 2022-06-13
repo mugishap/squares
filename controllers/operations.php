@@ -22,7 +22,7 @@ class Operations
     {
         $conn = $GLOBALS['conn'];
         $sql = "SELECT * FROM $this->table WHERE username = '$username'";
-        $result = mysqli_query($conn, $sql);
+        $result = mysqli_query($conn, $sql) or die("Error in query: " . mysqli_error($conn));
         if (mysqli_num_rows($result) != 0) {
             return false;
         } else {
@@ -33,7 +33,7 @@ class Operations
     {
         $conn = $GLOBALS['conn'];
         $sql = "SELECT * FROM $this->table WHERE email = '$email'";
-        $result = mysqli_query($conn, $sql);
+        $result = mysqli_query($conn, $sql) or die("Error in query: " . mysqli_error($conn));
         if (mysqli_num_rows($result) != 0) {
             return false;
         } else {
@@ -44,7 +44,7 @@ class Operations
     {
         $conn = $GLOBALS['conn'];
         $sql = "SELECT * FROM $this->table WHERE company = '$company'";
-        $result = mysqli_query($conn, $sql);
+        $result = mysqli_query($conn, $sql) or die("Error in query: " . mysqli_error($conn));
         if (mysqli_num_rows($result) != 0) {
             return false;
         } else {
@@ -79,7 +79,8 @@ class Operations
     {
         $this->username = $username;
         $this->password = $password;
-        $login = mysqli_query($GLOBALS['conn'], "SELECT * FROM users WHERE username = '$this->username' AND password = '$this->password'");
+        $encryptedPassword = hash("SHA512", $this->password);
+        $login = mysqli_query($GLOBALS['conn'], "SELECT * FROM users WHERE username = '$this->username' AND password = '$encryptedPassword'") or die(mysqli_error($GLOBALS['conn']));
         if (mysqli_num_rows($login) > 0) {
             return true;
         } else {
@@ -89,7 +90,7 @@ class Operations
     public function getAccount($username)
     {
         $this->username = $username;
-        $getAccount = mysqli_query($GLOBALS['conn'], "SELECT * FROM users WHERE username = '$this->username'");
+        $getAccount = mysqli_query($GLOBALS['conn'], "SELECT * FROM users WHERE username = '$this->username'") or die(mysqli_error($GLOBALS['conn']));
         if (mysqli_num_rows($getAccount) > 0) {
             return true;
         } else {
@@ -98,7 +99,7 @@ class Operations
     }
     public function getusers()
     {
-        $getusers = mysqli_query($GLOBALS['conn'], "SELECT * FROM users");
+        $getusers = mysqli_query($GLOBALS['conn'], "SELECT * FROM users") or die(mysqli_error($GLOBALS['conn']));
         if (mysqli_num_rows($getusers) > 0) {
             return true;
         } else {
@@ -108,7 +109,7 @@ class Operations
     public function deleteAccount($username)
     {
         $this->username = $username;
-        $deleteAccount = mysqli_query($GLOBALS['conn'], "DELETE FROM users WHERE username = '$this->username'");
+        $deleteAccount = mysqli_query($GLOBALS['conn'], "DELETE FROM users WHERE username = '$this->username'") or die(mysqli_error($GLOBALS['conn'])) or die(mysqli_error($GLOBALS['conn']));
     }
     public function updateAccount($username, $password, $email, $firstname, $lastname)
     {
@@ -117,7 +118,7 @@ class Operations
         $this->email = $email;
         $this->firstname = $firstname;
         $this->lastname = $lastname;
-        $updateAccount = mysqli_query($GLOBALS['conn'], "UPDATE users SET password = '$this->password', email = '$this->email', firstname = '$this->firstname', lastname = '$this->lastname' WHERE username = '$this->username'");
+        $updateAccount = mysqli_query($GLOBALS['conn'], "UPDATE users SET password = '$this->password', email = '$this->email', firstname = '$this->firstname', lastname = '$this->lastname' WHERE username = '$this->username'") or die(mysqli_error($GLOBALS['conn']));
     }
 
     public function createEntry($username, $title, $text)
@@ -125,7 +126,7 @@ class Operations
         $this->username = $username;
         $this->title = $title;
         $this->text = $text;
-        $insert = mysqli_query($GLOBALS['conn'], "INSERT INTO entries_$this->username (title, text) VALUES ('$this->title', '$this->text')");
+        $insert = mysqli_query($GLOBALS['conn'], "INSERT INTO entries_$this->username (title, text) VALUES ('$this->title', '$this->text')") or die(mysqli_error($GLOBALS['conn']));
         if ($insert) {
             echo "Entry created successfully!";
         } else {
@@ -136,7 +137,7 @@ class Operations
     public function getEntries($username)
     {
         $this->username = $username;
-        $getEntries = mysqli_query($GLOBALS['conn'], "SELECT * FROM entries_$this->username");
+        $getEntries = mysqli_query($GLOBALS['conn'], "SELECT * FROM entries_$this->username") or die(mysqli_error($GLOBALS['conn']));
         if (mysqli_num_rows($getEntries) > 0) {
             return true;
         } else {
