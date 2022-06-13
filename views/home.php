@@ -1,5 +1,10 @@
 <?php
 
+include './../utils/checkLoggedIn.php';
+
+$getEntries = $operations->getEntries($user->username);
+
+echo "<h1>Welcome, " . $user->firstname." " . $user->lastname."!</h1>";
 
 
 ?>
@@ -13,6 +18,14 @@
     <title>Home</title>
 </head>
 <body>
-    
+    <div class="table">
+        <?php
+        if(!$getEntries){
+            ?>
+            <div>You have no entries in your databaase</div>
+            <?php
+        }
+        ?>
+    </div>
 </body>
 </html>

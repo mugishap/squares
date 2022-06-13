@@ -4,9 +4,28 @@
 namespace Controllers;
 
 include './../utils/connection.php';
+
+class User{
+    public $userid;
+    public $firstname;
+    public $lastname;
+    public $username;
+    public $email;
+    public $company;
+    public function __construct($userid, $firstname, $lastname, $username, $email, $company){
+        $this->userid = $userid;
+        $this->firstname = $firstname;
+        $this->lastname = $lastname;
+        $this->username = $username;
+        $this->email = $email;
+        $this->company = $company;
+    }
+
+}
+
 class Operations
 {
-
+public $userid;
     public $username;
     public $password;
     public $email;
@@ -62,7 +81,7 @@ class Operations
         $encryptedPassword = hash("SHA512", $this->password);
         $insert = mysqli_query($GLOBALS['conn'], "INSERT INTO users (username,company, password, email, firstname, lastname) VALUES ('$this->username', '$this->company','$encryptedPassword', '$this->email', '$this->firstname', '$this->lastname')") or die(mysqli_error($GLOBALS['conn']));
         if ($insert) {
-            $createEntryTable = mysqli_query($GLOBALS['conn'], "CREATE TABLE entries_".$this->username ." IF NOT EXISTS (entry_id VARCHAR(255) DEFAULT UUID(),count int auto_increment PRIMARY KEY NOT NULL, date DATE DEFAULT current_timestamp() NOT NULL, title VARCHAR(70) NOT NULL,amount int NOT NULL, price int NOT NULL, description VARCHAR(1000) NOT NULL)") or die(mysqli_error($GLOBALS['conn']));
+            $createEntryTable = mysqli_query($GLOBALS['conn'], "CREATE TABLE  IF NOT EXISTS entries_".$this->username ." (entry_id VARCHAR(255) DEFAULT UUID(),count int auto_increment PRIMARY KEY NOT NULL, date DATE DEFAULT current_timestamp() NOT NULL, title VARCHAR(70) NOT NULL,amount int NOT NULL, price int NOT NULL, description VARCHAR(1000) NOT NULL)") or die(mysqli_error($GLOBALS['conn']));
             if (!$createEntryTable) {
                 echo "Error creating account! in operations";
                 return false;
@@ -81,7 +100,9 @@ class Operations
         $this->password = $password;
         $encryptedPassword = hash("SHA512", $this->password);
         $login = mysqli_query($GLOBALS['conn'], "SELECT * FROM users WHERE username = '$this->username' AND password = '$encryptedPassword'") or die(mysqli_error($GLOBALS['conn']));
-        if (mysqli_num_rows($login) > 0) {
+        if (mysqli_num_rows($login) == 1) {
+            list($userid) = mysqli_fetch_row($login);
+            setcookie("SQUARE-USERID", $userid, time() + (86400 * 30), "/");
             return true;
         } else {
             return false;
@@ -97,7 +118,18 @@ class Operations
             return false;
         }
     }
-    public function getusers()
+    public function getUser($userid){
+        $this->userid = $userid;
+        $getUser = mysqli_query($GLOBALS['conn'], "SELECT * FROM users WHERE user_id = '$this->userid'") or die(mysqli_error($GLOBALS['conn']));
+        if (mysqli_num_rows($getUser) == 1) {
+            list($userid, ,$firstname, $lastname, $username, $email, $company,) = mysqli_fetch_array($getUser);
+            $user = new User($userid, $firstname, $lastname, $username, $email, $company);
+            return $user;
+        } else {
+            return false;
+        }
+    }
+    public function getUsers()
     {
         $getusers = mysqli_query($GLOBALS['conn'], "SELECT * FROM users") or die(mysqli_error($GLOBALS['conn']));
         if (mysqli_num_rows($getusers) > 0) {
@@ -139,6 +171,14 @@ class Operations
         $this->username = $username;
         $getEntries = mysqli_query($GLOBALS['conn'], "SELECT * FROM entries_$this->username") or die(mysqli_error($GLOBALS['conn']));
         if (mysqli_num_rows($getEntries) > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    public function checkLoggedIn()
+    {
+        if (isset($_COOKIE['SQUARE-USERID'])) {
             return true;
         } else {
             return false;
