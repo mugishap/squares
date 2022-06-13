@@ -5,14 +5,16 @@ namespace Controllers;
 
 include './../utils/connection.php';
 
-class User{
+class User
+{
     public $userid;
     public $firstname;
     public $lastname;
     public $username;
     public $email;
     public $company;
-    public function __construct($userid, $firstname, $lastname, $username, $email, $company){
+    public function __construct($userid, $firstname, $lastname, $username, $email, $company)
+    {
         $this->userid = $userid;
         $this->firstname = $firstname;
         $this->lastname = $lastname;
@@ -20,12 +22,11 @@ class User{
         $this->email = $email;
         $this->company = $company;
     }
-
 }
 
 class Operations
 {
-public $userid;
+    public $userid;
     public $username;
     public $password;
     public $email;
@@ -81,16 +82,14 @@ public $userid;
         $encryptedPassword = hash("SHA512", $this->password);
         $insert = mysqli_query($GLOBALS['conn'], "INSERT INTO users (username,company, password, email, firstname, lastname) VALUES ('$this->username', '$this->company','$encryptedPassword', '$this->email', '$this->firstname', '$this->lastname')") or die(mysqli_error($GLOBALS['conn']));
         if ($insert) {
-            $createEntryTable = mysqli_query($GLOBALS['conn'], "CREATE TABLE  IF NOT EXISTS entries_".$this->username ." (entry_id VARCHAR(255) DEFAULT UUID(),count int auto_increment PRIMARY KEY NOT NULL, date DATE DEFAULT current_timestamp() NOT NULL, title VARCHAR(70) NOT NULL,amount int NOT NULL, price int NOT NULL, description VARCHAR(1000) NOT NULL)") or die(mysqli_error($GLOBALS['conn']));
+            $createEntryTable = mysqli_query($GLOBALS['conn'], "CREATE TABLE  IF NOT EXISTS entries_" . $this->username . " (entry_id VARCHAR(255) DEFAULT UUID(),count int auto_increment PRIMARY KEY NOT NULL, date DATE DEFAULT current_timestamp() NOT NULL, title VARCHAR(70) NOT NULL,amount int NOT NULL, price int NOT NULL, description VARCHAR(1000) NOT NULL)") or die(mysqli_error($GLOBALS['conn']));
             if (!$createEntryTable) {
                 echo "Error creating account! in operations";
                 return false;
-            }
-            else{
+            } else {
                 return true;
             }
-        }
-        else{
+        } else {
             return false;
         }
     }
@@ -118,11 +117,12 @@ public $userid;
             return false;
         }
     }
-    public function getUser($userid){
+    public function getUser($userid)
+    {
         $this->userid = $userid;
         $getUser = mysqli_query($GLOBALS['conn'], "SELECT * FROM users WHERE user_id = '$this->userid'") or die(mysqli_error($GLOBALS['conn']));
         if (mysqli_num_rows($getUser) == 1) {
-            list($userid, ,$firstname, $lastname, $username, $email, $company,) = mysqli_fetch_array($getUser);
+            list($userid,, $firstname, $lastname, $username, $email, $company,) = mysqli_fetch_array($getUser);
             $user = new User($userid, $firstname, $lastname, $username, $email, $company);
             return $user;
         } else {
@@ -146,23 +146,26 @@ public $userid;
     public function updateAccount($username, $password, $email, $firstname, $lastname)
     {
         $this->username = $username;
-        $this->password = $password;
         $this->email = $email;
         $this->firstname = $firstname;
         $this->lastname = $lastname;
-        $updateAccount = mysqli_query($GLOBALS['conn'], "UPDATE users SET password = '$this->password', email = '$this->email', firstname = '$this->firstname', lastname = '$this->lastname' WHERE username = '$this->username'") or die(mysqli_error($GLOBALS['conn']));
+        $updateAccount = mysqli_query($GLOBALS['conn'], "UPDATE users SET  email = '$this->email', firstname = '$this->firstname', lastname = '$this->lastname' WHERE username = '$this->username'") or die(mysqli_error($GLOBALS['conn']));
     }
 
-    public function createEntry($username, $title, $text)
+    public function createEntry($username, $title, $amount, $price, $description)
     {
         $this->username = $username;
         $this->title = $title;
-        $this->text = $text;
-        $insert = mysqli_query($GLOBALS['conn'], "INSERT INTO entries_$this->username (title, text) VALUES ('$this->title', '$this->text')") or die(mysqli_error($GLOBALS['conn']));
+        $this->description = $description;
+        $this->amount = $amount;
+        $this->price = $price;
+
+        $sql = "INSERT INTO entries_$this->username (title,amount,price, description) VALUES ('$this->title',$this->amount,$this->price, '$this->description')";
+        $insert = mysqli_query($GLOBALS['conn'], $sql) or die(mysqli_error($GLOBALS['conn']));
         if ($insert) {
-            echo "Entry created successfully!";
+            return true;
         } else {
-            echo "Error creating entry!";
+            return false;
         }
     }
 
@@ -171,7 +174,8 @@ public $userid;
         $this->username = $username;
         $getEntries = mysqli_query($GLOBALS['conn'], "SELECT * FROM entries_$this->username") or die(mysqli_error($GLOBALS['conn']));
         if (mysqli_num_rows($getEntries) > 0) {
-            return true;
+            $data = mysqli_fetch_all($getEntries, MYSQLI_ASSOC);
+            return $data;
         } else {
             return false;
         }
