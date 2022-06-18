@@ -1,8 +1,10 @@
 # Squares
+==========
 
 This is a stock management system to simplify the recording and making business transactions
 
-## ##Some of the queries used
+# Some of the queries used
+==========================
 
 Create users:
 CREATE TABLE users (
@@ -16,7 +18,7 @@ company varchar(30) NOT NULL,
 password varchar(255) NOT NULL
 );
 
-#Create entries:
+# Create entries:
 ------------------------------------------------------
 CREATE TABLE entries_username (
 entry_id VARCHAR(255) DEFAULT UUID(),
